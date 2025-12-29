@@ -64,6 +64,7 @@ BIN_COMPARTMENTS_GROUP_ID = 'compartments_group'
 BIN_SCOOP_GROUP_ID = 'bin_scoop_group'
 BIN_TAB_FEATURES_GROUP_ID = 'bin_tab_features_group'
 BIN_BASE_FEATURES_GROUP_ID = 'bin_base_features_group'
+BIN_PADDING_GROUP_ID = 'bin_padding_group'
 USER_CHANGES_GROUP_ID = 'user_changes_group'
 PREVIEW_GROUP_ID = 'preview_group'
 INFO_GROUP = 'info_group'
@@ -117,6 +118,11 @@ BIN_TYPE_DROPDOWN_ID = 'bin_type'
 BIN_TYPE_HOLLOW = 'Hollow'
 BIN_TYPE_SHELLED = 'Shelled'
 BIN_TYPE_SOLID = 'Solid'
+BIN_HAS_PADDING_INPUT_ID = 'bin_has_padding'
+BIN_PADDING_LEFT_INPUT_ID = 'bin_padding_left'
+BIN_PADDING_TOP_INPUT_ID = 'bin_padding_top'
+BIN_PADDING_RIGHT_INPUT_ID = 'bin_padding_right'
+BIN_PADDING_BOTTOM_INPUT_ID = 'bin_padding_bottom'
 
 INPUT_CHANGES_SAVE_DEFAULTS = 'input_changes_buttons_save_new_defaults'
 INPUT_CHANGES_RESET_TO_DEFAULTS = 'input_changes_button_reset_to_defaults'
@@ -152,6 +158,7 @@ def initDefaultUiState():
     commandUIState.initValue(BIN_SCOOP_GROUP_ID, True, adsk.core.GroupCommandInput.classType())
     commandUIState.initValue(BIN_TAB_FEATURES_GROUP_ID, True, adsk.core.GroupCommandInput.classType())
     commandUIState.initValue(BIN_BASE_FEATURES_GROUP_ID, True, adsk.core.GroupCommandInput.classType())
+    commandUIState.initValue(BIN_PADDING_GROUP_ID, True, adsk.core.GroupCommandInput.classType())
     commandUIState.initValue(USER_CHANGES_GROUP_ID, True, adsk.core.GroupCommandInput.classType())
     commandUIState.initValue(PREVIEW_GROUP_ID, True, adsk.core.GroupCommandInput.classType())
 
@@ -190,6 +197,12 @@ def initDefaultUiState():
     commandUIState.initValue(BIN_MAGNET_CUTOUTS_TABS_INPUT_ID, False, adsk.core.BoolValueCommandInput.classType())
     commandUIState.initValue(BIN_MAGNET_DIAMETER_INPUT, const.DIMENSION_MAGNET_CUTOUT_DIAMETER, adsk.core.ValueCommandInput.classType())
     commandUIState.initValue(BIN_MAGNET_HEIGHT_INPUT, const.DIMENSION_MAGNET_CUTOUT_DEPTH, adsk.core.ValueCommandInput.classType())
+
+    commandUIState.initValue(BIN_HAS_PADDING_INPUT_ID, False, adsk.core.BoolValueCommandInput.classType())
+    commandUIState.initValue(BIN_PADDING_LEFT_INPUT_ID, 0, adsk.core.ValueCommandInput.classType())
+    commandUIState.initValue(BIN_PADDING_TOP_INPUT_ID, 0, adsk.core.ValueCommandInput.classType())
+    commandUIState.initValue(BIN_PADDING_RIGHT_INPUT_ID, 0, adsk.core.ValueCommandInput.classType())
+    commandUIState.initValue(BIN_PADDING_BOTTOM_INPUT_ID, 0, adsk.core.ValueCommandInput.classType())
 
     commandCompartmentsTableUIState = []
     recordedDefaults = configUtils.readJsonConfig(UI_INPUT_DEFAULTS_CONFIG_PATH)
@@ -463,6 +476,11 @@ def is_all_input_valid(inputs: adsk.core.CommandInputs):
     binCompartmentsTable: adsk.core.TableCommandInput = inputs.itemById(BIN_COMPARTMENTS_TABLE_ID)
     compartmentsX: adsk.core.IntegerSpinnerCommandInput = inputs.itemById(BIN_COMPARTMENTS_GRID_BASE_WIDTH_ID)
     compartmentsY: adsk.core.IntegerSpinnerCommandInput = inputs.itemById(BIN_COMPARTMENTS_GRID_BASE_LENGTH_ID)
+    has_padding: adsk.core.BoolValueCommandInput = inputs.itemById(BIN_HAS_PADDING_INPUT_ID)
+    padding_left: adsk.core.ValueCommandInput = inputs.itemById(BIN_PADDING_LEFT_INPUT_ID)
+    padding_top: adsk.core.ValueCommandInput = inputs.itemById(BIN_PADDING_TOP_INPUT_ID)
+    padding_right: adsk.core.ValueCommandInput = inputs.itemById(BIN_PADDING_RIGHT_INPUT_ID)
+    padding_bottom: adsk.core.ValueCommandInput = inputs.itemById(BIN_PADDING_BOTTOM_INPUT_ID)
 
     result = result and base_width_unit.value > 1
     result = result and base_length_unit.value > 1
@@ -654,6 +672,28 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
     magnetHeightInput.minimumValue = 0.1
     magnetHeightInput.isMinimumInclusive = True
     commandUIState.registerCommandInput(magnetHeightInput)
+
+    paddingGroup = inputs.addGroupCommandInput(BIN_PADDING_GROUP_ID, 'Side padding')
+    paddingGroup.isExpanded = commandUIState.getState(BIN_PADDING_GROUP_ID)
+    commandUIState.registerCommandInput(paddingGroup)
+    hasPaddingCheckboxInput = paddingGroup.children.addBoolValueInput(BIN_HAS_PADDING_INPUT_ID, 'Add side padding', True, '', commandUIState.getState(BIN_HAS_PADDING_INPUT_ID))
+    commandUIState.registerCommandInput(hasPaddingCheckboxInput)
+    paddingLeftInput = paddingGroup.children.addValueInput(BIN_PADDING_LEFT_INPUT_ID, 'Padding left', defaultLengthUnits, adsk.core.ValueInput.createByReal(commandUIState.getState(BIN_PADDING_LEFT_INPUT_ID)))
+    paddingLeftInput.minimumValue = 0
+    paddingLeftInput.isMinimumInclusive = True
+    commandUIState.registerCommandInput(paddingLeftInput)
+    paddingTopInput = paddingGroup.children.addValueInput(BIN_PADDING_TOP_INPUT_ID, 'Padding top', defaultLengthUnits, adsk.core.ValueInput.createByReal(commandUIState.getState(BIN_PADDING_TOP_INPUT_ID)))
+    paddingTopInput.minimumValue = 0
+    paddingTopInput.isMinimumInclusive = True
+    commandUIState.registerCommandInput(paddingTopInput)
+    paddingRightInput = paddingGroup.children.addValueInput(BIN_PADDING_RIGHT_INPUT_ID, 'Padding right', defaultLengthUnits, adsk.core.ValueInput.createByReal(commandUIState.getState(BIN_PADDING_RIGHT_INPUT_ID)))
+    paddingRightInput.minimumValue = 0
+    paddingRightInput.isMinimumInclusive = True
+    commandUIState.registerCommandInput(paddingRightInput)
+    paddingBottomInput = paddingGroup.children.addValueInput(BIN_PADDING_BOTTOM_INPUT_ID, 'Padding left', defaultLengthUnits, adsk.core.ValueInput.createByReal(commandUIState.getState(BIN_PADDING_BOTTOM_INPUT_ID)))
+    paddingBottomInput.minimumValue = 0
+    paddingBottomInput.isMinimumInclusive = True
+    commandUIState.registerCommandInput(paddingBottomInput)
 
     userChangesGroup = inputs.addGroupCommandInput(USER_CHANGES_GROUP_ID, 'Changes')
     userChangesGroup.isExpanded = commandUIState.getState(USER_CHANGES_GROUP_ID)
@@ -883,6 +923,12 @@ def generateBin(args: adsk.core.CommandEventArgs):
     binCompartmentsTable: adsk.core.TableCommandInput = inputs.itemById(BIN_COMPARTMENTS_TABLE_ID)
     compartmentsX: adsk.core.IntegerSpinnerCommandInput = inputs.itemById(BIN_COMPARTMENTS_GRID_BASE_WIDTH_ID)
     compartmentsY: adsk.core.IntegerSpinnerCommandInput = inputs.itemById(BIN_COMPARTMENTS_GRID_BASE_LENGTH_ID)
+    bin_padding: adsk.core.BoolValueCommandInput = inputs.itemById(BIN_HAS_PADDING_INPUT_ID)
+    bin_padding_left: adsk.core.ValueCommandInput = inputs.itemById(BIN_PADDING_LEFT_INPUT_ID)
+    bin_padding_top: adsk.core.ValueCommandInput = inputs.itemById(BIN_PADDING_TOP_INPUT_ID)
+    bin_padding_right: adsk.core.ValueCommandInput = inputs.itemById(BIN_PADDING_RIGHT_INPUT_ID)
+    bin_padding_bottom: adsk.core.ValueCommandInput = inputs.itemById(BIN_PADDING_BOTTOM_INPUT_ID)
+
 
     isHollow = binTypeDropdownInput.selectedItem.name == BIN_TYPE_HOLLOW
     isSolid = binTypeDropdownInput.selectedItem.name == BIN_TYPE_SOLID
@@ -952,6 +998,11 @@ def generateBin(args: adsk.core.CommandEventArgs):
         binBodyInput.tabOverhangAngle = binTabAngle.value
         binBodyInput.compartmentsByX = compartmentsX.value
         binBodyInput.compartmentsByY = compartmentsY.value
+        binBodyInput.hasPadding = bin_padding.value
+        binBodyInput.paddingLeft = bin_padding_left.value
+        binBodyInput.paddingTop = bin_padding_top.value
+        binBodyInput.paddingRight = bin_padding_right.value
+        binBodyInput.paddingBottom = bin_padding_bottom.value
 
         if binCompartmentGridTypeDropdownInput.selectedItem.name == BIN_COMPARTMENTS_GRID_TYPE_UNIFORM:
             binBodyInput.compartments = uniformCompartments(binBodyInput.compartmentsByX, binBodyInput.compartmentsByY)
