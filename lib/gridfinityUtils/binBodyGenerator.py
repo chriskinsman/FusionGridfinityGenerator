@@ -30,8 +30,8 @@ def createGridfinityBinBody(
     targetComponent: adsk.fusion.Component,
 ) -> tuple[adsk.fusion.BRepBody, adsk.fusion.BRepBody]:
 
-    actualBodyWidth = (input.baseWidth * input.binWidth) - input.xyClearance * 2.0
-    actualBodyLength = (input.baseLength * input.binLength) - input.xyClearance * 2.0
+    actualBodyWidth = (input.baseWidth * input.binWidth) + input.paddingLeft + input.paddingRight - input.xyClearance * 2.0
+    actualBodyLength = (input.baseLength * input.binLength) + input.paddingTop + input.paddingBottom - input.xyClearance * 2.0
     binHeightWithoutBase = input.binHeight - 1
     binBodyTotalHeight = binHeightWithoutBase * input.heightUnit + max(0, input.heightUnit - const.BIN_BASE_HEIGHT)
     features: adsk.fusion.Features = targetComponent.features
@@ -71,6 +71,11 @@ def createGridfinityBinBody(
         lipInput.xyClearance = input.xyClearance
         lipInput.binCornerFilletRadius = input.binCornerFilletRadius
         lipInput.origin = lipOriginPoint
+        lipInput.hasPadding = input.hasPadding
+        lipInput.paddingLeft = input.paddingLeft
+        lipInput.paddingTop = input.paddingTop
+        lipInput.paddingRight = input.paddingRight
+        lipInput.paddingBottom = input.paddingBottom
         lipBody = createGridfinityBinBodyLip(lipInput, targetComponent)
 
         if input.wallThickness < const.BIN_LIP_WALL_THICKNESS:

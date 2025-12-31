@@ -403,8 +403,8 @@ def cutBaseClearance(
     basesYCount,
     targetComponent: adsk.fusion.Component,
 ):
-    actual_base_width = baseConfiguration.baseWidth * basesXCount - baseConfiguration.xyClearance * 2
-    actual_base_length = baseConfiguration.baseLength * basesYCount - baseConfiguration.xyClearance * 2
+    actual_base_width = baseConfiguration.baseWidth * basesXCount + baseConfiguration.paddingLeft + baseConfiguration.paddingRight - baseConfiguration.xyClearance * 2
+    actual_base_length = baseConfiguration.baseLength * basesYCount + baseConfiguration.paddingTop + baseConfiguration.paddingBottom - baseConfiguration.xyClearance * 2
     features = targetComponent.features
     baseConstructionPlaneInput: adsk.fusion.ConstructionPlaneInput = targetComponent.constructionPlanes.createInput()
     baseConstructionPlaneInput.setByOffset(targetComponent.xYConstructionPlane, adsk.core.ValueInput.createByReal(baseConfiguration.originPoint.z))
