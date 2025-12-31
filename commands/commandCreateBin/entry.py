@@ -958,7 +958,6 @@ def generateBin(args: adsk.core.CommandEventArgs):
         features: adsk.fusion.Features = gridfinityBinComponent.features
 
         # create base interface
-        # TODO: Need to update origin for Left / Bottom padding
         baseGeneratorInput = BaseGeneratorInput()
         baseGeneratorInput.originPoint = geometryUtils.createOffsetPoint(
             gridfinityBinComponent.originConstructionPoint.geometry,
