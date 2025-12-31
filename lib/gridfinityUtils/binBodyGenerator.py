@@ -35,12 +35,17 @@ def createGridfinityBinBody(
     binHeightWithoutBase = input.binHeight - 1
     binBodyTotalHeight = binHeightWithoutBase * input.heightUnit + max(0, input.heightUnit - const.BIN_BASE_HEIGHT)
     features: adsk.fusion.Features = targetComponent.features
-    binBodyExtrude = extrudeUtils.createBox(
+    originPoint: adsk.core.Point3D = geometryUtils.createOffsetPoint(
+            targetComponent.originConstructionPoint.geometry,
+            byX=-input.paddingLeft,
+            byY=-input.paddingBottom,
+        )
+    binBodyExtrude = extrudeUtils.createBoxAtPoint(
         actualBodyWidth,
         actualBodyLength,
         binBodyTotalHeight,
         targetComponent,
-        targetComponent.xYConstructionPlane
+        originPoint,
     )
     binBody = binBodyExtrude.bodies.item(0)
     binBody.name = 'Bin body'
@@ -58,8 +63,8 @@ def createGridfinityBinBody(
 
     if input.hasLip:
         lipOriginPoint = adsk.core.Point3D.create(
-            0,
-            0,
+            -input.paddingLeft,
+            -input.paddingBottom,
             binHeightWithoutBase * input.heightUnit + max(0, input.heightUnit - const.BIN_BASE_HEIGHT)
         )
         lipInput = BinBodyLipGeneratorInput()
@@ -127,8 +132,8 @@ def createGridfinityBinBody(
         compartmentLengthUnit = (totalCompartmentsLength - (input.compartmentsByY - 1) * input.wallThickness) / input.compartmentsByY
 
         for compartment in input.compartments:
-            compartmentX = compartmentsMinX + compartment.positionX * (compartmentWidthUnit + input.wallThickness)
-            compartmentY = compartmentsMinY + compartment.positionY * (compartmentLengthUnit + input.wallThickness)
+            compartmentX = compartmentsMinX + compartment.positionX * (compartmentWidthUnit + input.wallThickness) - input.paddingLeft
+            compartmentY = compartmentsMinY + compartment.positionY * (compartmentLengthUnit + input.wallThickness) - input.paddingBottom
             compartmentOriginPoint = adsk.core.Point3D.create(
                 compartmentX,
                 compartmentY,

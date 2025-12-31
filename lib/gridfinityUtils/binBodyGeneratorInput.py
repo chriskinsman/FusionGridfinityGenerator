@@ -260,7 +260,7 @@ class BinBodyGeneratorInput():
 
     @property
     def paddingLeft(self) -> float:
-        return self._paddingLeft
+        return self._paddingLeft if self._hasPadding else 0
     
     @paddingLeft.setter
     def paddingLeft(self, value: float):
@@ -268,7 +268,7 @@ class BinBodyGeneratorInput():
 
     @property
     def paddingTop(self) -> float:
-        return self._paddingTop
+        return self._paddingTop if self._hasPadding else 0
     
     @paddingTop.setter
     def paddingTop(self, value: float):
@@ -276,7 +276,7 @@ class BinBodyGeneratorInput():
 
     @property
     def paddingRight(self) -> float:
-        return self._paddingRight
+        return self._paddingRight if self._hasPadding else 0
     
     @paddingRight.setter
     def paddingRight(self, value: float):
@@ -284,7 +284,7 @@ class BinBodyGeneratorInput():
 
     @property
     def paddingBottom(self) -> float:
-        return self._paddingBottom
+        return self._paddingBottom if self._hasPadding else 0
     
     @paddingBottom.setter
     def paddingBottom(self, value: float):

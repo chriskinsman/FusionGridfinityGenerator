@@ -698,7 +698,7 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
     paddingRightInput.minimumValue = 0
     paddingRightInput.isMinimumInclusive = True
     commandUIState.registerCommandInput(paddingRightInput)
-    paddingBottomInput = paddingGroup.children.addValueInput(BIN_PADDING_BOTTOM_INPUT_ID, 'Padding left', defaultLengthUnits, adsk.core.ValueInput.createByReal(commandUIState.getState(BIN_PADDING_BOTTOM_INPUT_ID)))
+    paddingBottomInput = paddingGroup.children.addValueInput(BIN_PADDING_BOTTOM_INPUT_ID, 'Padding bottom', defaultLengthUnits, adsk.core.ValueInput.createByReal(commandUIState.getState(BIN_PADDING_BOTTOM_INPUT_ID)))
     paddingBottomInput.minimumValue = 0
     paddingBottomInput.isMinimumInclusive = True
     commandUIState.registerCommandInput(paddingBottomInput)

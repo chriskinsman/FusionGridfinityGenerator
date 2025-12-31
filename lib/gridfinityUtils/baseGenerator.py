@@ -416,8 +416,8 @@ def cutBaseClearance(
         actual_base_width,
         actual_base_length,
         adsk.core.Point3D.create(
-            baseConfiguration.originPoint.x + baseConfiguration.xyClearance,
-            baseConfiguration.originPoint.y + baseConfiguration.xyClearance,
+            baseConfiguration.originPoint.x + baseConfiguration.xyClearance - baseConfiguration.paddingLeft,
+            baseConfiguration.originPoint.y + baseConfiguration.xyClearance - baseConfiguration.paddingBottom,
             baseConfiguration.originPoint.z,
         ),
         baseClearanceCutSketch

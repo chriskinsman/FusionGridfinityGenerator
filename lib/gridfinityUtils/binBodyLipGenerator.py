@@ -130,7 +130,7 @@ def createGridfinityBinBodyLip(
         sketchUtils.createRectangle(
             actualLipBodyWidth,
             actualLipBodyLength,
-            topChamferSketch.modelToSketchSpace(adsk.core.Point3D.create(0, 0, topChamferSketch.origin.z)),
+            topChamferSketch.modelToSketchSpace(adsk.core.Point3D.create(-input.paddingLeft, -input.paddingBottom, topChamferSketch.origin.z)),
             topChamferSketch,
         )
         topChamferNegativeVolume = extrudeUtils.simpleDistanceExtrude(
