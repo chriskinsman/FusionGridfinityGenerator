@@ -175,8 +175,8 @@ def createGridfinityBinBody(
             compartmentsTopClearance = createCompartmentCutout(
                 input.wallThickness,
                 adsk.core.Point3D.create(
-                    compartmentsMinX,
-                    compartmentsMinY,
+                    compartmentsMinX - input.paddingLeft,
+                    compartmentsMinY - input.paddingBottom,
                     binBodyTotalHeight
                 ),
                 actualBodyWidth - input.wallThickness * 2,
