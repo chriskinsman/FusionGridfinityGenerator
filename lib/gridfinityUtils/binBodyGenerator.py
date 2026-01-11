@@ -91,8 +91,8 @@ def createGridfinityBinBody(
                 lipBottomChamferSize,
                 targetComponent,
                 adsk.core.Point3D.create(
-                    input.wallThickness,
-                    (const.BIN_LIP_WALL_THICKNESS - input.xyClearance) if input.hasScoop else input.wallThickness,
+                    input.wallThickness - input.paddingLeft,
+                    (const.BIN_LIP_WALL_THICKNESS - input.xyClearance - input.paddingBottom) if input.hasScoop else input.wallThickness - input.paddingBottom,
                     lipOriginPoint.z,
                 )
             )
