@@ -39,7 +39,7 @@ commandCompartmentsTableUIState: list[CommandUiState] = []
 IS_PROMOTED = True
 
 # TODO *** Define the location where the command button will be created. ***
-# This is done by specifying the workspace, the tab, and the panel, and the 
+# This is done by specifying the workspace, the tab, and the panel, and the
 # command it will be inserted beside. Not providing the command to position it
 # will insert it at the end.
 WORKSPACE_ID = 'FusionSolidEnvironment'
@@ -268,7 +268,6 @@ def stop():
     addinConfig = configUtils.readConfig(CONFIG_FOLDER_PATH)
     addinConfig['UI']['is_promoted'] = 'yes' if command_control.isPromoted else 'no'
     configUtils.writeConfig(addinConfig, CONFIG_FOLDER_PATH)
-        
 
     # Delete the button command control
     if command_control:
@@ -683,7 +682,7 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
     futil.add_handler(args.command.destroy, command_destroy, local_handlers=local_handlers)
 
 
-# This event handler is called when the user clicks the OK button in the command dialog or 
+# This event handler is called when the user clicks the OK button in the command dialog or
 # is immediately called after the created event not command inputs were created for the dialog.
 def command_execute(args: adsk.core.CommandEventArgs):
     futil.log(f'{CMD_NAME} Command Execute Event')
@@ -775,7 +774,7 @@ def command_validate_input(args: adsk.core.ValidateInputsEventArgs):
     futil.log(f'{CMD_NAME} Validate Input Event')
 
     inputs = args.inputs
-    
+
     # Verify the validity of the input values. This controls if the OK button is enabled or not.
     args.areInputsValid = is_all_input_valid(inputs)
     futil.log(f'{CMD_NAME} Inputs are {"valid" if args.areInputsValid else "invalid"}')
@@ -833,7 +832,7 @@ def onChangeValidate():
     commandUIState.getInput(BIN_TAB_WIDTH_INPUT_ID).isEnabled = generateTab
     commandUIState.getInput(BIN_TAB_ANGLE_INPUT_ID).isEnabled = generateTab
     commandUIState.getInput(BIN_TAB_POSITION_INPUT_ID).isEnabled = generateTab
-    
+
     compartmentsGridType: str = commandUIState.getState(BIN_COMPARTMENTS_GRID_TYPE_ID)
     commandUIState.getInput(BIN_COMPARTMENTS_TABLE_ID).isVisible = compartmentsGridType == BIN_COMPARTMENTS_GRID_TYPE_CUSTOM
 
@@ -890,17 +889,22 @@ def generateBin(args: adsk.core.CommandEventArgs):
 
     try:
         des = adsk.fusion.Design.cast(app.activeProduct)
-        if des.designType == 0:
+        if des.designType == adsk.fusion.DesignTypes.DirectDesignType:
             raise UnsupportedDesignTypeException('Timeline must be enabled for the generator to work, projects with disabled design history currently are not supported')
         root = adsk.fusion.Component.cast(des.rootComponent)
+
         xyClearance = xy_clearance.value
         binName = 'Gridfinity bin {}x{}x{}'.format(int(bin_length.value), int(bin_width.value), int(bin_height.value))
 
-        # create new component
-        newCmpOcc = adsk.fusion.Occurrences.cast(root.occurrences).addNewComponent(adsk.core.Matrix3D.create())
-        newCmpOcc.component.name = binName
-        newCmpOcc.activate()
-        gridfinityBinComponent: adsk.fusion.Component = newCmpOcc.component
+        originalTimelineCount = des.timeline.count
+        if des.designIntent == adsk.fusion.DesignIntentTypes.HybridDesignIntentType:
+            # create new component, only allowed in hybrid intent type
+            newCmpOcc = adsk.fusion.Occurrences.cast(root.occurrences).addNewComponent(adsk.core.Matrix3D.create())
+            newCmpOcc.component.name = binName
+            newCmpOcc.activate()
+            gridfinityBinComponent: adsk.fusion.Component = newCmpOcc.component
+        else:
+            gridfinityBinComponent: adsk.fusion.Component = des.rootComponent
         features: adsk.fusion.Features = gridfinityBinComponent.features
 
         # create base interface
@@ -1014,7 +1018,7 @@ def generateBin(args: adsk.core.CommandEventArgs):
                 binBody = gridfinityBinComponent.bRepBodies.item(0)
             else:
                 shellUtils.simpleShell([topFace], binBodyInput.wallThickness - xyClearance, gridfinityBinComponent)
-            
+
             if hasTabInput.value:
                 compartmentTabInput = BinBodyTabGeneratorInput()
                 tabOriginPoint = adsk.core.Point3D.create(
@@ -1040,7 +1044,7 @@ def generateBin(args: adsk.core.CommandEventArgs):
                 combineUtils.joinBodies(binBody, commonUtils.objectCollectionFromList([tabMainBody]), gridfinityBinComponent)
 
         # group features in timeline
-        binGroup = des.timeline.timelineGroups.add(newCmpOcc.timelineObject.index, newCmpOcc.timelineObject.index + gridfinityBinComponent.features.count + gridfinityBinComponent.constructionPlanes.count + gridfinityBinComponent.constructionAxes.count + gridfinityBinComponent.sketches.count)
+        binGroup = des.timeline.timelineGroups.add(originalTimelineCount, des.timeline.count - 1)
         binGroup.name = binName
     except UnsupportedDesignTypeException as err:
         args.executeFailed = True
