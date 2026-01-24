@@ -684,7 +684,7 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
     paddingGroup = inputs.addGroupCommandInput(BIN_PADDING_GROUP_ID, 'Side padding')
     paddingGroup.isExpanded = commandUIState.getState(BIN_PADDING_GROUP_ID)
     commandUIState.registerCommandInput(paddingGroup)
-    hasPaddingCheckboxInput = paddingGroup.children.addBoolValueInput(BIN_HAS_PADDING_INPUT_ID, 'Add side padding', True, '', commandUIState.getState(BIN_HAS_PADDING_INPUT_ID))
+    hasPaddingCheckboxInput = paddingGroup.children.addBoolValueInput(BIN_HAS_PADDING_INPUT_ID, 'Add padding', True, '', commandUIState.getState(BIN_HAS_PADDING_INPUT_ID))
     commandUIState.registerCommandInput(hasPaddingCheckboxInput)
     paddingLeftInput = paddingGroup.children.addValueInput(BIN_PADDING_LEFT_INPUT_ID, 'Padding left', defaultLengthUnits, adsk.core.ValueInput.createByReal(commandUIState.getState(BIN_PADDING_LEFT_INPUT_ID)))
     paddingLeftInput.minimumValue = 0
